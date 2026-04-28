@@ -1,0 +1,8 @@
+{
+  "name": "@org/registration-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "registration-e2e"
+  }
+}
