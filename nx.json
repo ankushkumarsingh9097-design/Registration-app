@@ -86,9 +86,6 @@
     },
     "test": {
       "dependsOn": ["^build"]
-    },
-    "serve": {
-      "outputStyle": "static"
     }
   },
   "generators": {

@@ -59,7 +59,6 @@
         "continuous": true,
         "executor": "@nx/js:node",
         "defaultConfiguration": "development",
-        "outputStyle": "static",
         "dependsOn": [
           "build"
         ],
