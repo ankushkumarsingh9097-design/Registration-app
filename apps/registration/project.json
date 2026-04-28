@@ -58,7 +58,6 @@
         }
       },
       "defaultConfiguration": "development",
-      "dependsOn": ["@org/api:serve", "@org/api:serve"],
       "options": {
         "proxyConfig": "apps/registration/proxy.conf.json"
       }

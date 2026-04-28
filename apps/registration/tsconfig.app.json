@@ -2,7 +2,12 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "types": []
+    "types": [],
+    "emitDeclarationOnly": false,
+    "composite": false,
+    "lib": ["es2022", "dom"],
+    "module": "es2022",
+    "moduleResolution": "bundler"
   },
   "include": ["src/**/*.ts"],
   "exclude": [
@@ -13,3 +18,4 @@
     "src/test-setup.ts"
   ]
 }
+

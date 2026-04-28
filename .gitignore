@@ -50,3 +50,6 @@ Thumbs.db
 .angular
 
 test-output
+
+# local environment variables
+.env
