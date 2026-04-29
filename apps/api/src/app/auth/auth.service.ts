@@ -21,13 +21,14 @@ export class AuthService {
     return null;
   }
 
-  async register(createUserDto: CreateUserDto) {
+  async signup(createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
     const tokens = await this.generateTokens(user);
     await this.usersService.setRefreshToken(user.id, tokens.refreshToken);
     return {
       user: this.sanitizeUser(user),
-      ...tokens,
+      token: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     };
   }
 
@@ -36,7 +37,8 @@ export class AuthService {
     await this.usersService.setRefreshToken(user.id, tokens.refreshToken);
     return {
       user: this.sanitizeUser(user),
-      ...tokens,
+      token: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     };
   }
 
@@ -58,7 +60,8 @@ export class AuthService {
 
     return {
       user: this.sanitizeUser(user),
-      ...tokens,
+      token: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     };
   }
 
@@ -68,17 +71,21 @@ export class AuthService {
     return {
       accessToken: this.jwtService.sign(payload, {
         secret: environment.jwt.accessSecret,
-        expiresIn: environment.jwt.accessExpiresIn,
+        expiresIn: environment.jwt.accessExpiresIn as unknown as number,
       }),
       refreshToken: this.jwtService.sign(payload, {
         secret: environment.jwt.refreshSecret,
-        expiresIn: environment.jwt.refreshExpiresIn,
+        expiresIn: environment.jwt.refreshExpiresIn as unknown as number,
       }),
     };
   }
 
   private sanitizeUser(user: User) {
-    const { password, refreshToken, ...result } = user;
-    return result;
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      avatar: user.avatar,
+    };
   }
 }

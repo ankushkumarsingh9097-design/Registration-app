@@ -13,7 +13,7 @@ import { environment } from '../../config/environment';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: environment.jwt.accessSecret,
-      signOptions: { expiresIn: environment.jwt.accessExpiresIn },
+      signOptions: { expiresIn: environment.jwt.accessExpiresIn as unknown as number },
     }),
   ],
   controllers: [AuthController],

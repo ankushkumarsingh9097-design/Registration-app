@@ -4,6 +4,7 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  UnauthorizedException,
   UseGuards,
   Request,
 } from '@nestjs/common';
@@ -15,32 +16,33 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('register')
+  /** POST /api/auth/signup */
+  @Post('signup')
   @HttpCode(HttpStatus.CREATED)
-  register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
+  signup(@Body() createUserDto: CreateUserDto) {
+    return this.authService.signup(createUserDto);
   }
 
+  /** POST /api/auth/login */
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  login(@Body() body: { email: string; password: string }) {
-    return this.authService
-      .validateUser(body.email, body.password)
-      .then((user) => {
-        if (user) {
-          return this.authService.login(user);
-        }
-        return { message: 'Invalid credentials' };
-      });
+  async login(@Body() body: { email: string; password: string }) {
+    const user = await this.authService.validateUser(body.email, body.password);
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+    return this.authService.login(user);
   }
 
+  /** POST /api/auth/logout */
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  logout(@Request() req: any) {
+  logout(@Request() req: { user: { userId: string } }) {
     return this.authService.logout(req.user.userId);
   }
 
+  /** POST /api/auth/refresh */
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   refresh(@Body() body: { userId: string; refreshToken: string }) {

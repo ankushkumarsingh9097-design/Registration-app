@@ -2,6 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { RestClient } from '../../services/rest-client';
 
 export interface User {
   id: string;
@@ -40,14 +41,19 @@ export class AuthService {
   readonly isLoggedIn = computed(() => !!this._token());
   readonly currentUser = computed(() => this._user());
 
-  constructor(private readonly router: Router) {}
+  constructor(
+    private readonly router: Router,
+    private _restClient: RestClient,
+  ) {}
 
   signIn(payload: SignInPayload): Observable<AuthResponse> {
     return this.mockSignIn(payload).pipe(tap((res) => this.persist(res)));
   }
 
   signUp(payload: SignUpPayload): Observable<AuthResponse> {
-    return this.mockSignUp(payload).pipe(tap((res) => this.persist(res)));
+    return this._restClient
+      .post('auth/signup', payload)
+      .pipe(tap((res) => this.persist(res)));
   }
 
   signOut(): void {
@@ -93,28 +99,6 @@ export class AuthService {
           });
         }
       }, 900);
-    });
-  }
-
-  private mockSignUp(payload: SignUpPayload): Observable<AuthResponse> {
-    return new Observable<AuthResponse>((observer) => {
-      setTimeout(() => {
-        if (payload.fullName && payload.email && payload.password.length >= 6) {
-          observer.next({
-            user: {
-              id: crypto.randomUUID(),
-              fullName: payload.fullName,
-              email: payload.email,
-            },
-            token: `mock_token_${Date.now()}`,
-          });
-          observer.complete();
-        } else {
-          observer.error({
-            message: 'Registration failed. Please check your details.',
-          });
-        }
-      }, 1000);
     });
   }
 }

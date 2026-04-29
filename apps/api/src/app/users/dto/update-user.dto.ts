@@ -11,10 +11,11 @@ export class UpdateUserDto {
   password?: string;
 
   @IsString()
+  @MinLength(2)
   @IsOptional()
-  firstName?: string;
+  fullName?: string;
 
   @IsString()
   @IsOptional()
-  lastName?: string;
+  avatar?: string;
 }

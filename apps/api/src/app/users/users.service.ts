@@ -40,8 +40,8 @@ export class UsersService {
       select: [
         'id',
         'email',
-        'firstName',
-        'lastName',
+        'fullName',
+        'avatar',
         'role',
         'createdAt',
         'updatedAt',
@@ -55,8 +55,8 @@ export class UsersService {
       select: [
         'id',
         'email',
-        'firstName',
-        'lastName',
+        'fullName',
+        'avatar',
         'role',
         'createdAt',
         'updatedAt',

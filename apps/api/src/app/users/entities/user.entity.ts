@@ -18,16 +18,16 @@ export class User {
   password!: string;
 
   @Column()
-  firstName!: string;
+  fullName!: string;
 
-  @Column()
-  lastName!: string;
+  @Column({ type: 'varchar', nullable: true })
+  avatar?: string;
 
   @Column({ default: 'user' })
   role!: string;
 
-  @Column({ nullable: true })
-  refreshToken?: string;
+  @Column({ type: 'varchar', nullable: true })
+  refreshToken?: string | null;
 
   @CreateDateColumn()
   createdAt!: Date;
