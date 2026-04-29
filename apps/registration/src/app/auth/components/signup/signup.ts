@@ -31,7 +31,7 @@ export class Signup {
 
   readonly form: FormGroup = this.fb.group(
     {
-      name: ['', [Validators.required, Validators.minLength(2)]],
+      fullName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]],
@@ -85,13 +85,21 @@ export class Signup {
     this.isLoading.set(true);
     this.errorMsg.set(null);
 
-    const { name, email, password } = this.form.value as {
-      name: string;
+    const { fullName, email, password, terms } = this.form.value as {
+      fullName: string;
       email: string;
       password: string;
+      terms: boolean;
     };
 
-    this.auth.signUp({ name, email, password }).subscribe({
+    console.log('Full Form Data:', {
+      fullName,
+      email,
+      password,
+      termsAccepted: terms,
+    });
+
+    this.auth.signUp({ fullName, email, password, terms }).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.router.navigate(['/dashboard']);

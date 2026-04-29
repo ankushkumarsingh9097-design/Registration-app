@@ -5,7 +5,7 @@ import { tap } from 'rxjs/operators';
 
 export interface User {
   id: string;
-  name: string;
+  fullName: string;
   email: string;
   avatar?: string;
 }
@@ -21,42 +21,35 @@ export interface SignInPayload {
 }
 
 export interface SignUpPayload {
-  name: string;
+  fullName: string;
   email: string;
   password: string;
+  terms: boolean;
 }
 
 const TOKEN_KEY = 'auth_token';
-const USER_KEY  = 'auth_user';
+const USER_KEY = 'auth_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  /* ── Reactive state ── */
-  private readonly _user  = signal<User | null>(this.loadUser());
+  private readonly _user = signal<User | null>(this.loadUser());
   private readonly _token = signal<string | null>(this.loadToken());
 
-  readonly user        = this._user.asReadonly();
-  readonly token       = this._token.asReadonly();
-  readonly isLoggedIn  = computed(() => !!this._token());
+  readonly user = this._user.asReadonly();
+  readonly token = this._token.asReadonly();
+  readonly isLoggedIn = computed(() => !!this._token());
   readonly currentUser = computed(() => this._user());
 
   constructor(private readonly router: Router) {}
 
-  /* ── Sign In ── */
   signIn(payload: SignInPayload): Observable<AuthResponse> {
-    return this.mockSignIn(payload).pipe(
-      tap((res) => this.persist(res))
-    );
+    return this.mockSignIn(payload).pipe(tap((res) => this.persist(res)));
   }
 
-  /* ── Sign Up ── */
   signUp(payload: SignUpPayload): Observable<AuthResponse> {
-    return this.mockSignUp(payload).pipe(
-      tap((res) => this.persist(res))
-    );
+    return this.mockSignUp(payload).pipe(tap((res) => this.persist(res)));
   }
 
-  /* ── Sign Out ── */
   signOut(): void {
     this._user.set(null);
     this._token.set(null);
@@ -65,7 +58,6 @@ export class AuthService {
     this.router.navigate(['/auth/signin']);
   }
 
-  /* ── Private helpers ── */
   private persist(res: AuthResponse): void {
     this._user.set(res.user);
     this._token.set(res.token);
@@ -82,7 +74,6 @@ export class AuthService {
     return raw ? (JSON.parse(raw) as User) : null;
   }
 
-  /* ── Mock API (replace with real HTTP calls) ── */
   private mockSignIn(payload: SignInPayload): Observable<AuthResponse> {
     return new Observable<AuthResponse>((observer) => {
       setTimeout(() => {
@@ -90,14 +81,16 @@ export class AuthService {
           observer.next({
             user: {
               id: crypto.randomUUID(),
-              name: payload.email.split('@')[0],
+              fullName: payload.email.split('@')[0],
               email: payload.email,
             },
             token: `mock_token_${Date.now()}`,
           });
           observer.complete();
         } else {
-          observer.error({ message: 'Invalid credentials. Check your email and password.' });
+          observer.error({
+            message: 'Invalid credentials. Check your email and password.',
+          });
         }
       }, 900);
     });
@@ -106,18 +99,20 @@ export class AuthService {
   private mockSignUp(payload: SignUpPayload): Observable<AuthResponse> {
     return new Observable<AuthResponse>((observer) => {
       setTimeout(() => {
-        if (payload.name && payload.email && payload.password.length >= 6) {
+        if (payload.fullName && payload.email && payload.password.length >= 6) {
           observer.next({
             user: {
               id: crypto.randomUUID(),
-              name: payload.name,
+              fullName: payload.fullName,
               email: payload.email,
             },
             token: `mock_token_${Date.now()}`,
           });
           observer.complete();
         } else {
-          observer.error({ message: 'Registration failed. Please check your details.' });
+          observer.error({
+            message: 'Registration failed. Please check your details.',
+          });
         }
       }, 1000);
     });
