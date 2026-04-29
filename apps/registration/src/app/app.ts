@@ -1,13 +1,11 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { NxWelcome } from './nx-welcome';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-  imports: [NxWelcome, RouterModule],
   selector: 'app-root',
-  templateUrl: './app.html',
-  styleUrl: './app.scss',
+  standalone: true,
+  imports: [RouterOutlet],
+  template: `<router-outlet />`,
+  styles: [`:host { display: block; }`],
 })
-export class App {
-  protected title = 'registration';
-}
+export class App {}
