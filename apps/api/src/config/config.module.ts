@@ -1,14 +1,11 @@
 import { Module, Global } from '@nestjs/common';
-import { databaseConfig } from './database.config';
+import { ConfigModule as NestConfigModule } from '@nestjs/config';
+import { AppConfigService } from './app-config.service';
 
 @Global()
 @Module({
-  providers: [
-    {
-      provide: 'DATABASE_CONFIG',
-      useValue: databaseConfig,
-    },
-  ],
-  exports: ['DATABASE_CONFIG'],
+    imports: [NestConfigModule],
+    providers: [AppConfigService],
+    exports: [AppConfigService],
 })
 export class ConfigModule {}

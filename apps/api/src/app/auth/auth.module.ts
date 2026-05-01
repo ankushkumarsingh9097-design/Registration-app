@@ -5,19 +5,22 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './guards/jwt.strategy';
 import { UsersModule } from '../users/users.module';
-import { environment } from '../../config/environment';
+import { AppConfigService } from '../../config/app-config.service';
 
 @Module({
-  imports: [
-    UsersModule,
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: environment.jwt.accessSecret,
-      signOptions: { expiresIn: environment.jwt.accessExpiresIn as unknown as number },
-    }),
-  ],
-  controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
+    imports: [
+        UsersModule,
+        PassportModule.register({ defaultStrategy: 'jwt' }),
+        JwtModule.registerAsync({
+            inject: [AppConfigService],
+            useFactory: (configService: AppConfigService) => ({
+                secret: configService.jwt.accessSecret,
+                signOptions: { expiresIn: configService.jwt.accessExpiresIn as unknown as number },
+            }),
+        }),
+    ],
+    controllers: [AuthController],
+    providers: [AuthService, JwtStrategy],
+    exports: [AuthService],
 })
 export class AuthModule {}
