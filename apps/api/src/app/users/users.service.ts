@@ -10,7 +10,7 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
     constructor(
         @InjectRepository(User)
-        private usersRepository: Repository<User>
+        private readonly usersRepository: Repository<User>
     ) {}
 
     async create(createUserDto: CreateUserDto): Promise<User> {
@@ -28,10 +28,7 @@ export class UsersService {
             password: hashedPassword,
         });
 
-        const savedUser = await this.usersRepository.save(user);
-        console.log('save user data is ', savedUser);
-
-        return savedUser;
+        return this.usersRepository.save(user);
     }
 
     async findAll(): Promise<User[]> {

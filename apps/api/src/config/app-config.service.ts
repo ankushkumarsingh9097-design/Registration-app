@@ -1,51 +1,69 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { ConfigService as NestConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
+import { JwtSignOptions } from '@nestjs/jwt';
+
+export interface DatabaseConfig {
+    type: string;
+    host: string;
+    port: number;
+    username: string;
+    password?: string;
+    database: string;
+    synchronize: boolean;
+    logging: boolean;
+}
+
+export interface JwtConfig {
+    accessSecret: string;
+    refreshSecret: string;
+    accessExpiresIn: JwtSignOptions['expiresIn'];
+    refreshExpiresIn: JwtSignOptions['expiresIn'];
+}
+
+export interface CorsConfig {
+    origin: string;
+    credentials: boolean;
+}
 
 @Injectable()
 export class AppConfigService {
-    constructor(private configService: NestConfigService) {}
-
     get port(): number {
-        return this.configService.get<number>('PORT') || 3000;
+        return parseInt(process.env.PORT || '3000', 10);
     }
 
     get nodeEnv(): string {
-        return this.configService.get<string>('NODE_ENV') || 'development';
+        return process.env.NODE_ENV || 'development';
     }
 
     get isProduction(): boolean {
         return this.nodeEnv === 'production';
     }
 
-    // Database
-    get db() {
+    get db(): DatabaseConfig {
         return {
-            type: this.configService.get<string>('DB_TYPE') || 'mysql',
-            host: this.configService.get<string>('DB_HOST') || 'localhost',
-            port: this.configService.get<number>('DB_PORT') || 3306,
-            username: this.configService.get<string>('DB_USERNAME') || 'root',
-            password: this.configService.get<string>('DB_PASSWORD') || 'root',
-            database: this.configService.get<string>('DB_DATABASE') || 'registration',
+            type: process.env.DB_TYPE || 'mysql',
+            host: process.env.DB_HOST || 'localhost',
+            port: parseInt(process.env.DB_PORT || '3306', 10),
+            username: process.env.DB_USERNAME || 'root',
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_DATABASE || 'registration',
             synchronize: !this.isProduction,
             logging: !this.isProduction,
         };
     }
 
-    // JWT
-    get jwt() {
+    get jwt(): JwtConfig {
         return {
-            accessSecret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-            refreshSecret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-            accessExpiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRES_IN'),
-            refreshExpiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
+            accessSecret: process.env.JWT_ACCESS_SECRET || 'defaultAccessSecret',
+            refreshSecret: process.env.JWT_REFRESH_SECRET || 'defaultRefreshSecret',
+            accessExpiresIn: (process.env.JWT_ACCESS_EXPIRES_IN || '15m') as JwtSignOptions['expiresIn'],
+            refreshExpiresIn: (process.env.JWT_REFRESH_EXPIRES_IN || '7d') as JwtSignOptions['expiresIn'],
         };
     }
 
-    // CORS
-    get cors() {
+    get cors(): CorsConfig {
         return {
-            origin: this.configService.get<string>('CORS_ORIGIN') || 'http://localhost:4200',
-            credentials: this.configService.get<string>('CORS_CREDENTIALS') === 'true',
+            origin: process.env.CORS_ORIGIN || 'http://localhost:4200',
+            credentials: process.env.CORS_CREDENTIALS === 'true',
         };
     }
 }
